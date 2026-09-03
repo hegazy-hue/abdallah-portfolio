@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عبدالله حجازي — مونتير سوشيال ميديا</title>
+<title>Abdallah Hegazy — Social Media Video Editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -13,8 +13,8 @@
     --surface-2: #1F1F24;
     --text: #F1EFEA;
     --muted: #8B8B93;
-    --magenta: #FF3366;
-    --mint: #35E0A6;
+    --magenta: #FFD23D;
+    --mint: #FFFFFF;
     --border: rgba(241,239,234,0.08);
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
@@ -25,7 +25,7 @@
     font-family:'Tajawal', sans-serif;
     overflow-x:hidden;
   }
-  .mono{ font-family:'JetBrains Mono', monospace; direction:ltr; unicode-bidi:isolate; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
   ::selection{ background:var(--magenta); color:#0B0B0D; }
   a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; cursor:pointer; }
@@ -47,10 +47,10 @@
   #timeline .tl-clip.active{ opacity:0.9; }
   #timeline .tl-playhead{
     position:absolute; top:-6px; bottom:-6px; width:2px; background:var(--text);
-    box-shadow:0 0 8px var(--text); transition:right .1s linear;
+    box-shadow:0 0 8px var(--text); transition:left .1s linear; left:0%;
   }
   #timeline .tl-playhead::before{
-    content:''; position:absolute; top:-1px; right:-4px;
+    content:''; position:absolute; top:-1px; left:-4px;
     border:5px solid transparent; border-top-color:var(--text);
   }
   #timeline .tl-code{ font-size:11px; color:var(--muted); white-space:nowrap; }
@@ -61,7 +61,60 @@
   }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
 
-  section{ padding:120px 6vw 90px; max-width:1200px; margin:0 auto; position:relative; }
+  /* ===== BACKGROUND TEXTURE (black film grain) ===== */
+  #bg-texture{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:180px 180px;
+    opacity:.06; mix-blend-mode:overlay;
+  }
+  #bg-texture::after{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at top, rgba(255,255,255,0.04), transparent 60%);
+  }
+
+  /* ===== GLASS SURFACES ===== */
+  #timeline{ background:rgba(23,23,27,0.55); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+  .clip-card, .service-card{
+    background:rgba(23,23,27,0.42); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(241,239,234,0.10);
+  }
+  #hero .badge{ background:rgba(23,23,27,0.4); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .socials a{ background:rgba(23,23,27,0.4); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .clip-empty input, .clip-empty select{ background:rgba(31,31,36,0.55); backdrop-filter:blur(6px); }
+  .tags span{ background:rgba(23,23,27,0.4); backdrop-filter:blur(8px); }
+  #particles{ position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+  .particle{
+    position:absolute; bottom:-40px;
+    animation:floatUp linear infinite;
+    filter:grayscale(1) brightness(1.6) opacity(0.5);
+  }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    12%{ opacity:.5; }
+    88%{ opacity:.35; }
+    100%{ transform:translateY(-115vh) translateX(var(--drift,20px)) rotate(25deg); opacity:0; }
+  }
+
+  /* ===== CURSOR SPOTLIGHT (trails behind the mouse) ===== */
+  #cursor-glow{
+    position:fixed; top:0; left:0; width:160px; height:160px;
+    border-radius:50%; z-index:2; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,210,64,0.45), rgba(255,210,64,0.12) 50%, transparent 75%);
+    transform:translate(-50%,-50%); opacity:0; transition:opacity .35s ease;
+    mix-blend-mode:screen; will-change:transform;
+  }
+
+  /* ===== HOVER SPOTLIGHT ON CARDS ===== */
+  .clip-card, .service-card{ position:relative; isolation:isolate; }
+  .clip-card::after, .service-card::after{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
+    background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%), rgba(53,224,166,0.22), transparent 70%);
+    opacity:0; transition:opacity .3s ease;
+  }
+  .clip-card:hover::after, .service-card:hover::after{ opacity:1; }
+
+  section{ padding:120px 6vw 90px; max-width:1200px; margin:0 auto; position:relative; z-index:2; }
   .eyebrow{
     display:inline-flex; align-items:center; gap:8px; font-size:12px;
     color:var(--muted); letter-spacing:.5px; margin-bottom:18px;
@@ -87,6 +140,22 @@
   @keyframes down{ 0%{ transform:scaleY(0); transform-origin:top;} 50%{transform:scaleY(1); transform-origin:top;} 51%{transform-origin:bottom;} 100%{transform:scaleY(0); transform-origin:bottom;} }
 
   h2.section-title{ font-size:clamp(30px,5vw,54px); font-weight:800; margin-bottom:50px; letter-spacing:-1px; }
+
+  /* ===== FILMING ===== */
+  #filming{ padding-top:70px; padding-bottom:70px; }
+  #filming .clapper{
+    font-size:13px; color:var(--muted); border:1px solid var(--border); display:inline-block;
+    padding:4px 10px; border-radius:6px; margin-bottom:16px;
+  }
+  #filming .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
+  #filming p.bio{ font-size:17px; line-height:1.9; color:#D8D6D0; }
+  #filming .tags{ display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  #filming .tags span{
+    padding:8px 14px; background:var(--surface); border:1px solid var(--border);
+    border-radius:100px; font-size:13px; color:var(--text);
+  }
+  #filming .tags span:nth-child(odd){ border-color:var(--mint); }
+  #filming .tags span:nth-child(even){ border-color:var(--magenta); }
 
   /* ===== GRID / CLIPS ===== */
   .clips-grid{
@@ -151,15 +220,15 @@
   /* ===== SERVICES ===== */
   .services-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
   .service-card{ background:var(--bg); padding:32px 24px; }
-  .service-card .num{ font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:12px; margin-bottom:14px; direction:ltr; }
+  .service-card .num{ font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:12px; margin-bottom:14px; }
   .service-card h3{ font-size:19px; margin-bottom:10px; font-weight:800; }
   .service-card p{ font-size:14px; color:var(--muted); line-height:1.7; }
 
   /* ===== CONTACT / CREDITS ===== */
   #contact{ text-align:center; padding-top:140px; }
   #contact .fin{ font-size:12px; color:var(--muted); margin-bottom:22px; }
-  #contact h2{ font-size:clamp(34px,7vw,70px); font-weight:900; margin-bottom:18px; }
-  #contact p{ color:var(--muted); font-size:16px; margin-bottom:34px; }
+  #contact h2{ font-size:clamp(34px,7vw,64px); font-weight:900; margin-bottom:18px; }
+  #contact p{ color:var(--muted); font-size:16px; margin-bottom:34px; max-width:640px; margin-left:auto; margin-right:auto; line-height:1.7; }
   .socials{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:60px; }
   .socials a{
     padding:12px 22px; border:1px solid var(--border); border-radius:100px; font-size:14px;
@@ -169,65 +238,94 @@
   footer{ text-align:center; padding:26px 0 50px; font-size:12px; color:var(--muted); }
 
   @media (max-width:760px){
-    #about .grid2{ grid-template-columns:1fr; gap:36px; }
+    #about .grid2, #filming .grid2{ grid-template-columns:1fr; gap:36px; }
     section{ padding:90px 6vw 60px; }
   }
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; }
     html{ scroll-behavior:auto; }
+    #particles, #cursor-glow{ display:none; }
   }
   :focus-visible{ outline:2px solid var(--mint); outline-offset:2px; }
 </style>
 </head>
 <body>
 
+<div id="bg-texture"></div>
+<div id="particles"></div>
+<div id="cursor-glow"></div>
+
 <div id="timeline">
   <span class="tl-rec"><span class="rec-dot"></span> REC</span>
   <div class="tl-track" id="tlTrack">
-    <div class="tl-playhead" id="playhead" style="right:0%"></div>
+    <div class="tl-playhead" id="playhead" style="left:0%"></div>
   </div>
   <span class="tl-code mono" id="tlCode">00:00:00:00</span>
 </div>
 
 <section id="hero">
-  <div class="badge"><span class="dot"></span> متاح لمشاريع جديدة</div>
-  <h1>عبدالله حجازي<span>.</span></h1>
-  <p class="tag">أنا هنا عشان أساعدك تحوّل خيالك لفكرة تتشاف.</p>
-  <div class="scroll-cue"><span class="line"></span> انزل شوف الشغل</div>
+  <div class="badge"><span class="dot"></span> Available for new projects</div>
+  <h1>Abdallah Hegazy<span>.</span></h1>
+  <p class="tag">I'm here to help you turn your imagination into an idea worth watching.</p>
+  <div class="scroll-cue"><span class="line"></span> Scroll to see the work</div>
+</section>
+
+<section id="filming">
+  <span class="clapper">SCENE 01 — TAKE 01</span>
+  <div class="grid2">
+    <div>
+      <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:02:00</span> — Filming</div>
+      <h2 class="section-title" style="margin-bottom:0;">I Also Shoot the Footage</h2>
+    </div>
+    <div>
+      <p class="bio">
+        A great edit starts with great footage. Alongside editing, I also handle filming myself —
+        so you get a complete service from the very first frame all the way to the final cut,
+        with a consistent look and story from start to finish.
+      </p>
+      <div class="tags">
+        <span>On-location Filming</span>
+        <span>Smartphone & Camera Shoots</span>
+        <span>Shot Planning</span>
+        <span>Full Production Service</span>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="work">
-  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:04:12</span> — الكليبات</div>
-  <h2 class="section-title">آخر شغل اتعمل</h2>
+  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:04:12</span> — Work</div>
+  <h2 class="section-title">Selected Work</h2>
   <div class="clips-grid" id="clipsGrid"></div>
   <button class="add-clip-tile" id="addClipBtn" style="margin-top:20px; aspect-ratio:auto; padding:22px;">
-    <span class="plus">＋</span> ضيف فيديو جديد من جوجل درايف
+    <span class="plus">＋</span> Add a new video from Google Drive
   </button>
   <p style="color:var(--muted); font-size:12.5px; margin-top:14px; line-height:1.8;">
-    * لازم رابط الفيديو على جوجل درايف يكون مشارك بصلاحية "أي حد معاه اللينك يقدر يشوف"، وإلا الفيديو مش هيشتغل هنا.<br>
-    * الفيديوهات اللي بتضيفها بتفضل موجودة لحد ما تقفل الصفحة أو تعمل رفرش — دي معاينة مش تخزين دائم، فلو حابب تثبتها كلمني وأنا أظبطها في الكود مباشرة.
+    * The Google Drive link must be shared with "Anyone with the link" access, otherwise the video won't play here.<br>
+    * Videos added here stay visible until the page is refreshed — this is a live preview, not permanent storage. If you'd like it permanent, let me know and I'll add it directly in the code.
   </p>
 </section>
 
 <section id="about">
-  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:09:00</span> — مين أنا</div>
+  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:09:00</span> — About</div>
   <div class="grid2">
     <div>
       <span class="clapper">SCENE 02 — TAKE 01</span>
-      <h2 class="section-title" style="margin-bottom:0;">حكايتي مع المونتاج</h2>
+      <h2 class="section-title" style="margin-bottom:0;">About My Craft</h2>
     </div>
     <div>
       <p class="bio">
-        بشتغل مونتير متخصص في محتوى السوشيال ميديا والريلز، هدفي إن كل فيديو يوصل فكرته من أول ٣ ثواني ويخلّي الناس تكمل لآخره.
-        بحب أدمج بين <strong>القص السريع</strong> و<strong>الإيقاع الموسيقي</strong> و<strong>الجرافيك البسيط</strong> عشان أطلع محتوى يحس المشاهد إنه بسيط بس اتحسب بدقة.
-        غيّر النص ده واكتب حكايتك زي ما تحب.
+        I specialize in editing social media content and reels — turning raw footage into fast-paced,
+        story-driven videos designed to stop the scroll from the first three seconds.
+        I blend <strong>quick cuts</strong>, <strong>rhythm-matched music</strong>, and <strong>clean motion graphics</strong>
+        into content that feels effortless to watch, but is built with precision behind the scenes.
       </p>
       <div class="tags">
-        <span>ريلز إنستجرام</span>
-        <span>تيك توك</span>
-        <span>كولر جريدنج</span>
-        <span>موشن جرافيك بسيط</span>
-        <span>ساوند ديزاين</span>
+        <span>Instagram Reels</span>
+        <span>TikTok</span>
+        <span>Color Grading</span>
+        <span>Motion Graphics</span>
+        <span>Sound Design</span>
         <span>Premiere Pro</span>
         <span>CapCut</span>
         <span>After Effects</span>
@@ -237,55 +335,110 @@
 </section>
 
 <section id="services">
-  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:14:20</span> — الخدمات</div>
-  <h2 class="section-title">إيه اللي بقدمه</h2>
+  <div class="eyebrow"><span class="dash"></span> <span class="mono">00:00:14:20</span> — Services</div>
+  <h2 class="section-title">What We Offer</h2>
   <div class="services-grid">
     <div class="service-card">
       <div class="num">01 / EDIT</div>
-      <h3>مونتاج ريلز وسوشيال ميديا</h3>
-      <p>قص وتنظيم وترتيب اللقطات بإيقاع سريع يناسب خوارزميات المنصات ويشد المشاهد لآخر الفيديو.</p>
+      <h3>Social Media & Reels Editing</h3>
+      <p>Cutting and pacing footage with a fast, scroll-stopping rhythm built for how each platform's algorithm rewards content.</p>
     </div>
     <div class="service-card">
       <div class="num">02 / COLOR</div>
-      <h3>كولر جريدنج</h3>
-      <p>توحيد ألوان اللقطات المختلفة وإضافة لوك بصري ثابت يميز شكل المحتوى.</p>
+      <h3>Color Grading</h3>
+      <p>Unifying the color of different shots and adding a consistent visual look that gives your content a signature feel.</p>
     </div>
     <div class="service-card">
       <div class="num">03 / MOTION</div>
-      <h3>موشن جرافيك وتايتلز</h3>
-      <p>نصوص متحركة وعناصر جرافيك بسيطة تدعم الرسالة من غير ما تبهدل الفيديو.</p>
+      <h3>Motion Graphics & Titles</h3>
+      <p>Animated text and clean graphic elements that support the message without cluttering the video.</p>
     </div>
     <div class="service-card">
       <div class="num">04 / SOUND</div>
-      <h3>ساوند ديزاين وموسيقى</h3>
-      <p>اختيار موسيقى وتأثيرات صوتية تزامن مع القصات وتدي إحساس أقوى للفيديو.</p>
+      <h3>Sound Design & Music</h3>
+      <p>Selecting music and sound effects that sync with the cuts and give the video a stronger emotional impact.</p>
     </div>
   </div>
 </section>
 
 <section id="contact">
   <div class="fin mono">— FIN —</div>
-  <h2>يلا نصور حاجة سوا</h2>
-  <p>لو عندك فكرة فيديو أو مشروع سوشيال ميديا، ابعتلي وهنظبطها مع بعض.</p>
+  <h2>Let's Create Something Great</h2>
+  <p>If you'd like to collaborate with us and create professional work that helps you reach your goal, contact us or get in touch.</p>
   <div class="socials">
-    <a href="mailto:Hegayi304@gmail.com">📧 الإيميل</a>
-    <a href="https://wa.me/201099626124" target="_blank" rel="noopener">💬 واتساب</a>
-    <a href="https://www.instagram.com/abdallahhegazii/" target="_blank" rel="noopener">📸 إنستجرام</a>
-    <a href="https://www.tiktok.com/@abdallahhegaziii" target="_blank" rel="noopener">🎵 تيك توك</a>
+    <a href="mailto:Hegayi304@gmail.com">📧 Email</a>
+    <a href="https://wa.me/201099626124" target="_blank" rel="noopener">💬 WhatsApp</a>
+    <a href="https://www.instagram.com/abdallahhegazii/" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@abdallahhegaziii" target="_blank" rel="noopener">🎵 TikTok</a>
   </div>
-  <footer>© <span id="year"></span> عبدالله حجازي — كل الحقوق محفوظة</footer>
+  <footer>© <span id="year"></span> Abdallah Hegazy — All rights reserved</footer>
 </section>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* ---------- بيانات الأقسام على التايملاين (العنصر المميز) ---------- */
+/* ---------- Floating background particles (editing & filming icons) ---------- */
+(function createParticles(){
+  const wrap = document.getElementById('particles');
+  const icons = ['🎬','🎥','📹','✂️','🎞️','🎧','▶️','🖥️'];
+  const count = window.innerWidth < 700 ? 14 : 26;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = icons[i % icons.length];
+    const size = Math.random()*14 + 14;
+    const left = Math.random()*100;
+    const duration = Math.random()*16 + 12;
+    const delay = Math.random()*18;
+    const drift = (Math.random()*80 - 40) + 'px';
+    p.style.left = left + 'vw';
+    p.style.fontSize = size + 'px';
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = '-' + delay + 's';
+    p.style.setProperty('--drift', drift);
+    wrap.appendChild(p);
+  }
+})();
+
+/* ---------- Cursor spotlight that trails behind the mouse ---------- */
+(function cursorSpotlight(){
+  const glow = document.getElementById('cursor-glow');
+  if(window.matchMedia('(hover: hover) and (pointer: fine)').matches === false) return;
+
+  let targetX = window.innerWidth/2, targetY = window.innerHeight/2;
+  let currentX = targetX, currentY = targetY;
+  let active = false;
+
+  document.addEventListener('mousemove', e=>{
+    targetX = e.clientX; targetY = e.clientY;
+    if(!active){ active = true; glow.style.opacity = '1'; }
+
+    const card = e.target.closest('.clip-card, .service-card');
+    if(card){
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX-rect.left)/rect.width*100) + '%');
+      card.style.setProperty('--my', ((e.clientY-rect.top)/rect.height*100) + '%');
+    }
+  });
+  document.addEventListener('mouseleave', ()=>{ active = false; glow.style.opacity = '0'; });
+
+  function loop(){
+    currentX += (targetX - currentX) * 0.12;
+    currentY += (targetY - currentY) * 0.12;
+    glow.style.transform = `translate(${currentX}px, ${currentY}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+/* ---------- Timeline sections data (signature element) ---------- */
 const sections = [
-  { id:'hero',    color:'#FF3366', label:'المقدمة' },
-  { id:'work',    color:'#35E0A6', label:'الأعمال' },
-  { id:'about',   color:'#FF3366', label:'مين أنا' },
-  { id:'services',color:'#35E0A6', label:'الخدمات' },
-  { id:'contact', color:'#FF3366', label:'تواصل' },
+  { id:'hero',    color:'#FF3366', label:'Intro' },
+  { id:'filming', color:'#35E0A6', label:'Filming' },
+  { id:'work',    color:'#FF3366', label:'Work' },
+  { id:'about',   color:'#35E0A6', label:'About' },
+  { id:'services',color:'#FF3366', label:'Services' },
+  { id:'contact', color:'#35E0A6', label:'Contact' },
 ];
 
 function buildTimelineTrack(){
@@ -300,7 +453,7 @@ function buildTimelineTrack(){
     clip.className = 'tl-clip';
     clip.dataset.id = s.id;
     clip.style.background = s.color;
-    clip.style.right = start + '%';
+    clip.style.left = start + '%';
     clip.style.width = Math.max(height,0.5) + '%';
     track.appendChild(clip);
   });
@@ -315,16 +468,14 @@ function updatePlayhead(){
   const scrollTop = window.scrollY;
   const max = document.body.scrollHeight - window.innerHeight;
   const pct = max>0 ? (scrollTop/max)*100 : 0;
-  document.getElementById('playhead').style.right = pct + '%';
+  document.getElementById('playhead').style.left = pct + '%';
 
-  // كود زمني تقريبي (دقيقة:ثانية:فريم وهمي) بناء على نسبة السكرول
-  const totalSeconds = Math.floor(pct * 3.6); // مجرد تمثيل بصري
+  const totalSeconds = Math.floor(pct * 3.6);
   const mm = String(Math.floor(totalSeconds/60)).padStart(2,'0');
   const ss = String(totalSeconds%60).padStart(2,'0');
   const ff = String(Math.floor((pct*10)%30)).padStart(2,'0');
   document.getElementById('tlCode').textContent = `00:${mm}:${ss}:${ff}`;
 
-  // تفعيل الكليب النشط
   let current = sections[0].id;
   sections.forEach(s=>{
     const el = document.getElementById(s.id);
@@ -337,19 +488,34 @@ function updatePlayhead(){
 window.addEventListener('scroll', updatePlayhead);
 window.addEventListener('load', updatePlayhead);
 
-/* ---------- كروت الفيديو (جوجل درايف) ---------- */
+/* ---------- Video clip cards (Google Drive) ---------- */
 let clips = [
-  { title:'ريلز سوشيال ميديا', cat:'سوشيال ميديا', driveId:'1LPQFR_WHmJ9dNXAxZIOWuR3OxjqXdyMy', dur:'' },
-  { title:'ريلز — مقطع قصير', cat:'سوشيال ميديا', driveId:'1IpCMTYrHWvBRkM9o4MkCQD7ZgwdCo4Ks', dur:'' },
-  { title:'ريلز — لقطة سريعة', cat:'سوشيال ميديا', driveId:'1AGERRyNxlain9fn0XQqlqNHr2r5fQfGx', dur:'' },
-  { title:'English Client Reel (1)', cat:'ريلز', driveId:'1clCIjkKymYofA8XBfFxZmXXlbEfXHZhV', dur:'' },
-  { title:'English Client Reel (2)', cat:'ريلز', driveId:'1hVm6Y8sq_I-qq0E_TG2PuinIMIUL1Hf6', dur:'' },
-  { title:'English Client Reel (3)', cat:'ريلز', driveId:'1D4tzSBFNyovg29iDAm8RAU1O9ocZgF8S', dur:'' },
-  { title:'English Client Reel (4)', cat:'ريلز', driveId:'1mz6VWe_o2l0JEswNDcJIzuiMMOIVx6-0', dur:'' },
-  { title:'English Client Reel (5)', cat:'ريلز', driveId:'1R2TzT2IR6h1NX5usSCilz2UtBLPZFpZv', dur:'' },
-  { title:'ريلز سوشيال ميديا (٤)', cat:'سوشيال ميديا', driveId:'1ynP6BvCca-2uruwIZXrLQ6aXdxDxS0XA', dur:'' },
-  { title:'ريلز سوشيال ميديا (٥)', cat:'سوشيال ميديا', driveId:'1I1DRDYi36CRdUZoL6o4bg3BB5_KT7ynS', dur:'' },
-  { title:'ريلز سوشيال ميديا (٦)', cat:'سوشيال ميديا', driveId:'18dG9WXk4JwSEjoZGNBKKUOhh7CFG7muR', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'1LPQFR_WHmJ9dNXAxZIOWuR3OxjqXdyMy', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'1IpCMTYrHWvBRkM9o4MkCQD7ZgwdCo4Ks', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'1AGERRyNxlain9fn0XQqlqNHr2r5fQfGx', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Reels', driveId:'1clCIjkKymYofA8XBfFxZmXXlbEfXHZhV', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Reels', driveId:'1hVm6Y8sq_I-qq0E_TG2PuinIMIUL1Hf6', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Reels', driveId:'1D4tzSBFNyovg29iDAm8RAU1O9ocZgF8S', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Reels', driveId:'1mz6VWe_o2l0JEswNDcJIzuiMMOIVx6-0', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Reels', driveId:'1R2TzT2IR6h1NX5usSCilz2UtBLPZFpZv', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'1ynP6BvCca-2uruwIZXrLQ6aXdxDxS0XA', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'1I1DRDYi36CRdUZoL6o4bg3BB5_KT7ynS', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'Social Media', driveId:'18dG9WXk4JwSEjoZGNBKKUOhh7CFG7muR', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'194T3mqjw8wjCxHqDgBG2U75M9nv4g-S_', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1UQfkDwDjM2eomS6tR36UxovDQmtrDkG3', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1xGFIARAYGiqhRD_1AEcIuA4RJcHOSue7', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1LaK18RJn7qILzg0DFNk1yIpzj6tHls_B', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1RjZAmNULcycCbFjMlST2j1S26jpPigxz', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'16FZh4U33RQ1andROCJKSUP28RhAniu_M', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1Jwqnh7JB9iIf6FpgDrYfDytMsymiztYH', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1uSN7BkM6jBSks59bGdnsaoBGyeKyEvoh', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'16_-4ePjija-ykw1OcM--FrYGxNWkVZPm', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1R1ZS-gTJ5T4suXl5dAJPMf7f8F2uV45q', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1_5SslqPYiMyJo6nhyLHY8CfgjvPJ8Tym', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1wNboUGx6JttEBjetuc_F4e83xLAVGD2K', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1SMGj1HX38a7t5KtOQPz7tFJfehhGeN1F', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1nCyW7QCjPq6HTYvjmee6Ib7hKauGlkM6', dur:'' },
+  { title:'ريلز سوشيال ميديا', cat:'ريلز', driveId:'1bF3LSyhczFeU-7Y1zirmmmZtZihMYd8z', dur:'' },
 ];
 
 function extractDriveId(url){
@@ -374,17 +540,17 @@ function renderClips(){
         <div class="clip-empty">
           <div class="icon">🎬</div>
           <form data-index="${i}">
-            <input type="text" name="title" placeholder="اسم الفيديو" value="${clip.title||''}" required>
+            <input type="text" name="title" placeholder="Video title" value="${clip.title||''}" required>
             <select name="cat">
-              <option ${clip.cat==='سوشيال ميديا'?'selected':''}>سوشيال ميديا</option>
-              <option ${clip.cat==='ريلز'?'selected':''}>ريلز</option>
-              <option ${clip.cat==='إعلان'?'selected':''}>إعلان</option>
-              <option ${clip.cat==='أفراح'?'selected':''}>أفراح</option>
-              <option ${clip.cat==='جيمنج'?'selected':''}>جيمنج</option>
+              <option ${clip.cat==='Social Media'?'selected':''}>Social Media</option>
+              <option ${clip.cat==='Reels'?'selected':''}>Reels</option>
+              <option ${clip.cat==='Ad'?'selected':''}>Ad</option>
+              <option ${clip.cat==='Wedding'?'selected':''}>Wedding</option>
+              <option ${clip.cat==='Gaming'?'selected':''}>Gaming</option>
             </select>
-            <input type="text" name="url" placeholder="رابط جوجل درايف" required>
-            <button type="submit" class="btn-save">حفظ الفيديو</button>
-            <small>الصق رابط المشاركة من جوجل درايف (لازم يكون "أي حد معاه اللينك")</small>
+            <input type="text" name="url" placeholder="Google Drive link" required>
+            <button type="submit" class="btn-save">Save video</button>
+            <small>Paste the Drive share link (must be set to "Anyone with the link")</small>
           </form>
         </div>`;
     }
@@ -393,8 +559,8 @@ function renderClips(){
     info.className = 'clip-info';
     info.innerHTML = `
       <div class="top-row">
-        <span class="title">${clip.title || 'بدون عنوان'}</span>
-        ${clip.driveId ? `<a href="#" class="edit-link" data-index="${i}">تعديل</a>` : ''}
+        <span class="title">${clip.title || 'Untitled'}</span>
+        ${clip.driveId ? `<a href="#" class="edit-link" data-index="${i}">Edit</a>` : ''}
       </div>
       <span class="cat">${clip.cat || ''}</span>
       <span class="tc mono">CLIP_${String(i+1).padStart(2,'0')}</span>
@@ -405,7 +571,6 @@ function renderClips(){
     grid.appendChild(card);
   });
 
-  // ربط الفورمات
   grid.querySelectorAll('form').forEach(form=>{
     form.addEventListener('submit', e=>{
       e.preventDefault();
@@ -413,14 +578,13 @@ function renderClips(){
       const url = form.url.value.trim();
       const id = extractDriveId(url);
       if(!id){
-        alert('مقدرتش أطلع الآيدي من الرابط، تأكد إنه رابط جوجل درايف صحيح.');
+        alert("Couldn't read the ID from that link — make sure it's a valid Google Drive link.");
         return;
       }
       clips[idx].title = form.title.value.trim();
       clips[idx].cat = form.cat.value;
       clips[idx].driveId = id;
       renderClips();
-      buildTimelineTrack(); // إعادة حساب أطوال الأقسام بعد تغيّر ارتفاع الصفحة
       buildTimelineReset();
     });
   });
@@ -441,7 +605,7 @@ function buildTimelineReset(){
 }
 
 document.getElementById('addClipBtn').addEventListener('click', ()=>{
-  clips.push({ title:'', cat:'سوشيال ميديا', driveId:'', dur:'' });
+  clips.push({ title:'', cat:'Social Media', driveId:'', dur:'' });
   renderClips();
   buildTimelineReset();
   document.getElementById('clipsGrid').lastElementChild.scrollIntoView({behavior:'smooth', block:'center'});
